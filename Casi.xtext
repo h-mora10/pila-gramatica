@@ -1,0 +1,211 @@
+grammar co.edu.uniandes.miso.payments.Casi with org.eclipse.xtext.common.Terminals
+
+generate casi "http://www.edu.co/uniandes/miso/payments/Casi"
+
+ServiceOperator returns ServiceOperator:
+	{ServiceOperator}
+	_SERVICE_OPERATOR name=ID LBRACKET ((attributes+=Attribute (SEMICOLON (attributes+=Attribute))*) SEMICOLON superEntities+=SuperEntity SEMICOLON (services+=Service (SEMICOLON (services+=Service))*))? RBRACKET;
+
+SuperEntity returns SuperEntity:
+	{SuperEntity}
+	_SUPER_ENTITY name=ID LBRACKET ((attributes+=Attribute | entities+=BusinessEntity | pays=Pay) (SEMICOLON (attributes+=Attribute | entities+=BusinessEntity | pays=Pay))*)? RBRACKET;
+
+BusinessEntity returns BusinessEntity:
+	{BusinessEntity}
+	 _BUSINESS_ENTITY name=ID LBRACKET attributes+=Attribute (SEMICOLON attributes+=Attribute)* RBRACKET;
+
+Pay returns Pay:
+	{Pay}
+	'Pagos' name=ID LBRACKET attributes+=Attribute (SEMICOLON attributes+=Attribute)* RBRACKET;
+
+Service returns Service:
+	{Service}
+	_SERVICE name=ID LBRACKET displayName+=Attribute (SEMICOLON calculate+=Calculate)+ RBRACKET;
+
+Calculate returns Calculate:
+	{Calculate}
+	'Calculo' name=ID LBRACKET (conditions+=If)* RBRACKET;
+
+If returns If:
+	{If}
+	'if' expressions+=Expression (LOGIC_OPERATOR expressions+=Expression)* LBRACKET
+		statements+=Statement*
+	RBRACKET
+	esleIf+=ElIf*
+	else=Else?;
+
+ElIf returns ElIf:
+	{ElIf}
+	'else_if' expressions+=Expression (LOGIC_OPERATOR expressions+=Expression)* LBRACKET
+	statements+=Statement*
+	RBRACKET;
+	
+Expression returns Expression:
+	{Expression}
+	(LPARENT? elementLeft=ExpressionElement comparator=LOGIC_COMPARATOR elementRight=ExpressionElement RPARENT?) | 
+	(elementLeft=ExpressionElement comparator='in' LSQUARE_BRACKET arrayElements+=ArrayElementsInOperator (COMMA arrayElements+=ArrayElementsInOperator)* RSQUARE_BRACKET);
+
+ExpressionElement returns ExpressionElement:
+	{ExpressionElement}
+	(element=OBJECT_VALUE | 
+		element=_SUPER_ENTITY | 
+		element=_BUSINESS_ENTITY | 
+		element=_SERVICE | 
+		element=_ATTRIBUTE | 
+		element=ID |
+		element=INTEGER_TYPE |
+		element=FLOAT_TYPE |
+		element=BOOLEAN_TYPE |
+		element=NAME);
+		
+ArrayElementsInOperator returns ArrayElementsInOperator:
+	{ArrayElementsInOperator}
+	(element=INTEGER_TYPE |
+		element=FLOAT_TYPE |		
+		element=NAME);
+	
+Statement returns Statement:	
+	If | Variable | Return;
+
+Else returns Else:
+	{Else}
+	'else' LBRACKET
+	statements+=Statement*
+	RBRACKET;
+	
+Variable returns Variable:
+	{Variable}
+	'var' name=ID EQUAL value=OBJECT_VALUE SEMICOLON;
+
+Return returns Return:
+	{Return}	
+	'retorne' value=Operation SEMICOLON;
+
+Operation returns Operation:
+	{Operation}
+	(valueLeft=OBJECT_VALUE| valueLeft=FLOAT_TYPE | valueLeft=INTEGER_TYPE) (operator=OPERATOR (valueRight=OBJECT_VALUE| valueRight=FLOAT_TYPE | valueRight=INTEGER_TYPE))*;
+
+Attribute returns Attribute:	
+	_ATTRIBUTE (StringValue | IntegerValue | FloatValue | BooleanValue | Array | Complex | Date | Enum);
+
+StringValue returns StringValue:
+	{StringValue}
+	'Texto' name=NAME _DISPLAY_NAME displayName=NAME; 
+
+Date returns Date:
+	{Date}
+	'Date' name=NAME _DISPLAY_NAME displayName=NAME;
+	
+Enum returns Enum:
+	{Enum}
+	'Enum' name=NAME _DISPLAY_NAME displayName=NAME LSQUARE_BRACKET INTEGER_TYPE (COMMA items += INTEGER_TYPE)* RSQUARE_BRACKET;
+	
+IntegerValue returns IntegerValue:
+	{IntegerValue}
+	'Entero' name=NAME _DISPLAY_NAME displayName=NAME;
+
+FloatValue returns FloatValue:
+	{FloatValue}
+	'Real' name=NAME _DISPLAY_NAME displayName=NAME;
+
+BooleanValue returns BooleanValue:
+	{BooleanValue}
+	'Booleano' name=NAME _DISPLAY_NAME displayName=NAME;
+
+Array returns Array:
+	{Array}
+	'Coleccion' name=NAME _DISPLAY_NAME displayName=NAME LSQUARE_BRACKET attributes+=Attribute (COMMA attributes+=Attribute)* RSQUARE_BRACKET;
+
+Complex returns Complex:
+	{Complex}
+	'Complejo' name=NAME _DISPLAY_NAME displayName=NAME LBRACKET attributes+=Attribute (SEMICOLON attributes+=Attribute)* RBRACKET;
+
+terminal STRING_TYPE:
+	DOUBLE_QUOTATION_MARKS STRING DOUBLE_QUOTATION_MARKS;
+
+terminal INTEGER_TYPE:
+	('0'..'9')+;
+
+terminal FLOAT_TYPE:
+	(NEGATIVE_SIGN)? INTEGER_TYPE DOT INTEGER_TYPE;
+
+terminal _SERVICE_OPERATOR:
+	'OperadorServicio';
+
+terminal _SUPER_ENTITY:
+	'SuperEntidad';
+	
+terminal _ATTRIBUTE:
+	'Atributo';
+
+terminal _BUSINESS_ENTITY:
+	'Entidad';
+
+terminal _SERVICE:
+	'Servicio';
+	
+terminal BOOLEAN_TYPE:
+	('true' | 'false');
+	
+terminal LBRACKET:
+	'{';
+
+terminal RBRACKET:
+	'}';
+
+terminal LSQUARE_BRACKET:
+	'[';
+
+terminal RSQUARE_BRACKET:
+	']';
+	
+terminal LPARENT:
+	'(';
+	
+terminal RPARENT:
+	')';
+
+terminal COMMA:
+	',';
+
+terminal SEMICOLON:
+	';';
+
+terminal DOUBLE_QUOTATION_MARKS:
+	'\"';
+
+terminal DOT:
+	'.';
+
+terminal NEGATIVE_SIGN:
+	'-';
+	
+terminal EQUAL:
+	'=';
+	
+terminal LOGIC_COMPARATOR:
+	'==' | '<' | '>' | '!=' | '<=' | '>=';
+	
+terminal LOGIC_OPERATOR:
+	'OR' | 'AND';
+
+terminal _DISPLAY_NAME:
+	'DisplayName=';
+	
+terminal OPERATOR:
+	'*' | '+' | '-' | '/';
+
+terminal ID:
+	super;	
+
+terminal NULL:
+	'-Null-';
+
+terminal NOT_NULL:
+	'-NotNull-';
+	
+terminal OBJECT_VALUE:
+	NULL | NOT_NULL |(ID ('.' ID)*);
+
+terminal NAME:
+	DOUBLE_QUOTATION_MARKS ('a'..'z'|'A'..'Z'|'_'|'0'..'9'|' '|'.'|'¿'|'?'|'á'|'é'|'í'|'ó'|'ú')* DOUBLE_QUOTATION_MARKS;	
