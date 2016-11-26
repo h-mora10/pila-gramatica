@@ -32,7 +32,7 @@ If returns If:
 		statements+=Statement*
 	RBRACKET
 	esleIf+=ElIf*
-	else=Else?;
+	els=Els?;
 
 ElIf returns ElIf:
 	{ElIf}
@@ -67,8 +67,8 @@ ArrayElementsInOperator returns ArrayElementsInOperator:
 Statement returns Statement:	
 	If | Variable | Return;
 
-Else returns Else:
-	{Else}
+Els returns Els:
+	{Els}
 	'else' LBRACKET
 	statements+=Statement*
 	RBRACKET;
