@@ -28,7 +28,7 @@ Calculate returns Calculate:
 
 If returns If:
 	{If}
-	'if' expressions+=Expression (logicOperator+=LOGIC_OPERATOR expressions+=Expression)* LBRACKET
+	'if' expressions+=Expression (logoperator+=LOGIC_OPERATOR expressions+=Expression)* LBRACKET
 		statements+=Statement*
 	RBRACKET
 	esleIf+=ElIf*
@@ -36,7 +36,7 @@ If returns If:
 
 ElIf returns ElIf:
 	{ElIf}
-	'else_if' expressions+=Expression (logicOperator+=LOGIC_OPERATOR expressions+=Expression)* LBRACKET
+	'else_if' expressions+=Expression (logoperator+=LOGIC_OPERATOR expressions+=Expression)* LBRACKET
 	statements+=Statement*
 	RBRACKET;
 	
