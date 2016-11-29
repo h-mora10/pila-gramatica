@@ -24,7 +24,7 @@ Service returns Service:
 
 Calculate returns Calculate:
 	{Calculate}
-	'Calculo' name=ID LBRACKET (conditions+=If)* RBRACKET;
+	'Calculo' name=ID LBRACKET (conditions+=Statement)* RBRACKET;
 
 If returns If:
 	{If}
